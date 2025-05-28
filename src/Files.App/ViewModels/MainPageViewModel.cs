@@ -17,38 +17,33 @@ namespace Files.App.ViewModels
 	/// </summary>
 	public sealed partial class MainPageViewModel : ObservableObject
 	{
-		// Dependency injections
-
-		private IAppearanceSettingsService AppearanceSettingsService { get; } = Ioc.Default.GetRequiredService<IAppearanceSettingsService>();
-		private IGeneralSettingsService GeneralSettingsService { get; } = Ioc.Default.GetRequiredService<IGeneralSettingsService>();
-		private INetworkService NetworkService { get; } = Ioc.Default.GetRequiredService<INetworkService>();
-		private IUserSettingsService UserSettingsService { get; } = Ioc.Default.GetRequiredService<IUserSettingsService>();
-		private IResourcesService ResourcesService { get; } = Ioc.Default.GetRequiredService<IResourcesService>();
-		private DrivesViewModel DrivesViewModel { get; } = Ioc.Default.GetRequiredService<DrivesViewModel>();
+		private readonly IAppearanceSettingsService AppearanceSettingsService = Ioc.Default.GetRequiredService<IAppearanceSettingsService>();
+		private readonly IGeneralSettingsService GeneralSettingsService = Ioc.Default.GetRequiredService<IGeneralSettingsService>();
+		private readonly INetworkService NetworkService = Ioc.Default.GetRequiredService<INetworkService>();
+		private readonly IUserSettingsService UserSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
+		private readonly IResourcesService ResourcesService = Ioc.Default.GetRequiredService<IResourcesService>();
+		private readonly DrivesViewModel DrivesViewModel = Ioc.Default.GetRequiredService<DrivesViewModel>();
 		public ShelfViewModel ShelfViewModel { get; } = Ioc.Default.GetRequiredService<ShelfViewModel>();
-
 		private readonly IContentPageContext context = Ioc.Default.GetRequiredService<IContentPageContext>();
 
-		// Properties
-
-		public static ObservableCollection<TabBarItem> AppInstances { get; private set; } = [];
-
-		public List<ITabBar> MultitaskingControls { get; } = [];
-
+		public static ObservableCollection<TabBarItem> AppInstances { get; } = new();
+		public List<ITabBar> MultitaskingControls { get; } = new();
 		public ITabBar? MultitaskingControl { get; set; }
 
-		private bool _IsSidebarPaneOpen;
+		// changed field name for clarity
+		private bool isSidebarPaneOpen;
 		public bool IsSidebarPaneOpen
 		{
-			get => _IsSidebarPaneOpen;
-			set => SetProperty(ref _IsSidebarPaneOpen, value);
+			get => isSidebarPaneOpen;
+			set => SetProperty(ref isSidebarPaneOpen, value);
 		}
 
-		private bool _IsSidebarPaneOpenToggleButtonVisible;
+		// changed field name for clarity
+		private bool isSidebarPaneOpenToggleButtonVisible;
 		public bool IsSidebarPaneOpenToggleButtonVisible
 		{
-			get => _IsSidebarPaneOpenToggleButtonVisible;
-			set => SetProperty(ref _IsSidebarPaneOpenToggleButtonVisible, value);
+			get => isSidebarPaneOpenToggleButtonVisible;
+			set => SetProperty(ref isSidebarPaneOpenToggleButtonVisible, value);
 		}
 
 		private TabBarItem? selectedTabItem;
@@ -79,119 +74,80 @@ namespace Files.App.ViewModels
 			set => SetProperty(ref shouldPreviewPaneBeDisplayed, value);
 		}
 
-		public bool ShowShelfPane
-			=> GeneralSettingsService.ShowShelfPane && AppLifecycleHelper.AppEnvironment is AppEnvironment.Dev;
-
-		public Stretch AppThemeBackgroundImageFit
-			=> AppearanceSettingsService.AppThemeBackgroundImageFit;
-
-		public float AppThemeBackgroundImageOpacity
-			=> AppearanceSettingsService.AppThemeBackgroundImageOpacity;
-
+		public bool ShowShelfPane => GeneralSettingsService.ShowShelfPane && AppLifecycleHelper.AppEnvironment == AppEnvironment.Dev;
+		public Stretch AppThemeBackgroundImageFit => AppearanceSettingsService.AppThemeBackgroundImageFit;
+		public float AppThemeBackgroundImageOpacity => AppearanceSettingsService.AppThemeBackgroundImageOpacity;
 		public ImageSource? AppThemeBackgroundImageSource
 		{
 			get
 			{
 				if (string.IsNullOrWhiteSpace(AppearanceSettingsService.AppThemeBackgroundImageSource))
 					return null;
-
-				if (!Uri.TryCreate(AppearanceSettingsService.AppThemeBackgroundImageSource, UriKind.RelativeOrAbsolute, out Uri? validUri))
+				if (!Uri.TryCreate(AppearanceSettingsService.AppThemeBackgroundImageSource, UriKind.RelativeOrAbsolute, out var validUri))
 					return null;
-
 				try
 				{
 					return new BitmapImage(validUri);
 				}
-				catch (Exception)
+				catch
 				{
-					// Catch potential errors
 					return null;
 				}
 			}
 		}
-
-		public VerticalAlignment AppThemeBackgroundImageVerticalAlignment
-			=> AppearanceSettingsService.AppThemeBackgroundImageVerticalAlignment;
-
-		public HorizontalAlignment AppThemeBackgroundImageHorizontalAlignment
-			=> AppearanceSettingsService.AppThemeBackgroundImageHorizontalAlignment;
-
-		public bool ShowToolbar =>
-			AppearanceSettingsService.ShowToolbar &&
-			context.PageType is not ContentPageTypes.Home &&
-			context.PageType is not ContentPageTypes.ReleaseNotes &&
-			context.PageType is not ContentPageTypes.Settings;
-
-		public bool ShowStatusBar =>
-			context.PageType is not ContentPageTypes.Home &&
-			context.PageType is not ContentPageTypes.ReleaseNotes &&
-			context.PageType is not ContentPageTypes.Settings;
-
-
-		// Commands
+		public VerticalAlignment AppThemeBackgroundImageVerticalAlignment => AppearanceSettingsService.AppThemeBackgroundImageVerticalAlignment;
+		public HorizontalAlignment AppThemeBackgroundImageHorizontalAlignment => AppearanceSettingsService.AppThemeBackgroundImageHorizontalAlignment;
+		public bool ShowToolbar => AppearanceSettingsService.ShowToolbar && context.PageType != ContentPageTypes.Home && context.PageType != ContentPageTypes.ReleaseNotes && context.PageType != ContentPageTypes.Settings;
+		public bool ShowStatusBar => context.PageType != ContentPageTypes.Home && context.PageType != ContentPageTypes.ReleaseNotes && context.PageType != ContentPageTypes.Settings;
 
 		public ICommand NavigateToNumberedTabKeyboardAcceleratorCommand { get; }
-
-		// Constructor
 
 		public MainPageViewModel()
 		{
 			NavigateToNumberedTabKeyboardAcceleratorCommand = new RelayCommand<KeyboardAcceleratorInvokedEventArgs>(ExecuteNavigateToNumberedTabKeyboardAcceleratorCommand);
-
 			AppearanceSettingsService.PropertyChanged += (s, e) =>
 			{
 				switch (e.PropertyName)
 				{
-					case nameof(AppearanceSettingsService.AppThemeBackgroundImageSource):
+					case nameof(IAppearanceSettingsService.AppThemeBackgroundImageSource):
 						OnPropertyChanged(nameof(AppThemeBackgroundImageSource));
 						break;
-					case nameof(AppearanceSettingsService.AppThemeBackgroundImageOpacity):
+					case nameof(IAppearanceSettingsService.AppThemeBackgroundImageOpacity):
 						OnPropertyChanged(nameof(AppThemeBackgroundImageOpacity));
 						break;
-					case nameof(AppearanceSettingsService.AppThemeBackgroundImageFit):
+					case nameof(IAppearanceSettingsService.AppThemeBackgroundImageFit):
 						OnPropertyChanged(nameof(AppThemeBackgroundImageFit));
 						break;
-					case nameof(AppearanceSettingsService.AppThemeBackgroundImageVerticalAlignment):
+					case nameof(IAppearanceSettingsService.AppThemeBackgroundImageVerticalAlignment):
 						OnPropertyChanged(nameof(AppThemeBackgroundImageVerticalAlignment));
 						break;
-					case nameof(AppearanceSettingsService.AppThemeBackgroundImageHorizontalAlignment):
+					case nameof(IAppearanceSettingsService.AppThemeBackgroundImageHorizontalAlignment):
 						OnPropertyChanged(nameof(AppThemeBackgroundImageHorizontalAlignment));
 						break;
-					case nameof(AppearanceSettingsService.ShowToolbar):
+					case nameof(IAppearanceSettingsService.ShowToolbar):
 						OnPropertyChanged(nameof(ShowToolbar));
 						break;
 				}
 			};
-
 			context.PropertyChanged += (s, e) =>
 			{
-				switch (e.PropertyName)
+				if (e.PropertyName == nameof(IContentPageContext.PageType))
 				{
-					case nameof(context.PageType):
-						OnPropertyChanged(nameof(ShowToolbar));
-						OnPropertyChanged(nameof(ShowStatusBar));
-						break;
+					OnPropertyChanged(nameof(ShowToolbar));
+					OnPropertyChanged(nameof(ShowStatusBar));
 				}
 			};
-
 			GeneralSettingsService.PropertyChanged += (s, e) =>
 			{
-				switch (e.PropertyName)
-				{
-					case nameof(GeneralSettingsService.ShowShelfPane):
-						OnPropertyChanged(nameof(ShowShelfPane));
-						break;
-				}
+				if (e.PropertyName == nameof(IGeneralSettingsService.ShowShelfPane))
+					OnPropertyChanged(nameof(ShowShelfPane));
 			};
 		}
-
-		// Methods
 
 		public async Task OnNavigatedToAsync(NavigationEventArgs e)
 		{
 			if (e.NavigationMode == NavigationMode.Back)
 				return;
-
 			var parameter = e.Parameter;
 			var ignoreStartupSettings = false;
 			if (parameter is MainPageNavigationArguments mainPageNavigationArguments)
@@ -199,48 +155,41 @@ namespace Files.App.ViewModels
 				parameter = mainPageNavigationArguments.Parameter;
 				ignoreStartupSettings = mainPageNavigationArguments.IgnoreStartupSettings;
 			}
-
 			if (parameter is null || (parameter is string eventStr && string.IsNullOrEmpty(eventStr)))
 			{
 				try
 				{
-					// add last session tabs to closed tabs stack if those tabs are not about to be opened
 					if (!UserSettingsService.AppSettingsService.RestoreTabsOnStartup && !UserSettingsService.GeneralSettingsService.ContinueLastSessionOnStartUp && UserSettingsService.GeneralSettingsService.LastSessionTabList != null)
 					{
 						var items = UserSettingsService.GeneralSettingsService.LastSessionTabList
 							.Where(tab => !string.IsNullOrEmpty(tab))
-							.Select(tab => TabBarItemParameter.Deserialize(tab)).ToArray();
-
+							.Select(TabBarItemParameter.Deserialize).ToArray();
 						BaseTabBar.PushRecentTab(items);
 					}
-
 					if (UserSettingsService.AppSettingsService.RestoreTabsOnStartup)
 					{
 						UserSettingsService.AppSettingsService.RestoreTabsOnStartup = false;
-						if (UserSettingsService.GeneralSettingsService.LastSessionTabList is not null)
+						if (UserSettingsService.GeneralSettingsService.LastSessionTabList != null)
 						{
-							foreach (string tabArgsString in UserSettingsService.GeneralSettingsService.LastSessionTabList)
+							foreach (var tabArgsString in UserSettingsService.GeneralSettingsService.LastSessionTabList)
 							{
 								var tabArgs = TabBarItemParameter.Deserialize(tabArgsString);
 								await NavigationHelpers.AddNewTabByParamAsync(tabArgs.InitialPageType, tabArgs.NavigationParameter);
 							}
-
 							if (!UserSettingsService.GeneralSettingsService.ContinueLastSessionOnStartUp)
 								UserSettingsService.GeneralSettingsService.LastSessionTabList = null;
 						}
 					}
-					else if (UserSettingsService.GeneralSettingsService.OpenSpecificPageOnStartup &&
-						UserSettingsService.GeneralSettingsService.TabsOnStartupList is not null)
+					else if (UserSettingsService.GeneralSettingsService.OpenSpecificPageOnStartup && UserSettingsService.GeneralSettingsService.TabsOnStartupList != null)
 					{
-						foreach (string path in UserSettingsService.GeneralSettingsService.TabsOnStartupList)
+						foreach (var path in UserSettingsService.GeneralSettingsService.TabsOnStartupList)
 							await NavigationHelpers.AddNewTabByPathAsync(typeof(ShellPanesPage), path, true);
 					}
-					else if (UserSettingsService.GeneralSettingsService.ContinueLastSessionOnStartUp &&
-						UserSettingsService.GeneralSettingsService.LastSessionTabList is not null)
+					else if (UserSettingsService.GeneralSettingsService.ContinueLastSessionOnStartUp && UserSettingsService.GeneralSettingsService.LastSessionTabList != null)
 					{
 						if (AppInstances.Count == 0)
 						{
-							foreach (string tabArgsString in UserSettingsService.GeneralSettingsService.LastSessionTabList)
+							foreach (var tabArgsString in UserSettingsService.GeneralSettingsService.LastSessionTabList)
 							{
 								var tabArgs = TabBarItemParameter.Deserialize(tabArgsString);
 								await NavigationHelpers.AddNewTabByParamAsync(tabArgs.InitialPageType, tabArgs.NavigationParameter);
@@ -263,17 +212,14 @@ namespace Files.App.ViewModels
 				{
 					try
 					{
-						if (UserSettingsService.GeneralSettingsService.OpenSpecificPageOnStartup &&
-								UserSettingsService.GeneralSettingsService.TabsOnStartupList is not null)
+						if (UserSettingsService.GeneralSettingsService.OpenSpecificPageOnStartup && UserSettingsService.GeneralSettingsService.TabsOnStartupList != null)
 						{
-							foreach (string path in UserSettingsService.GeneralSettingsService.TabsOnStartupList)
+							foreach (var path in UserSettingsService.GeneralSettingsService.TabsOnStartupList)
 								await NavigationHelpers.AddNewTabByPathAsync(typeof(ShellPanesPage), path, true);
 						}
-						else if (UserSettingsService.GeneralSettingsService.ContinueLastSessionOnStartUp &&
-							UserSettingsService.GeneralSettingsService.LastSessionTabList is not null &&
-							AppInstances.Count == 0)
+						else if (UserSettingsService.GeneralSettingsService.ContinueLastSessionOnStartUp && UserSettingsService.GeneralSettingsService.LastSessionTabList != null && AppInstances.Count == 0)
 						{
-							foreach (string tabArgsString in UserSettingsService.GeneralSettingsService.LastSessionTabList)
+							foreach (var tabArgsString in UserSettingsService.GeneralSettingsService.LastSessionTabList)
 							{
 								var tabArgs = TabBarItemParameter.Deserialize(tabArgsString);
 								await NavigationHelpers.AddNewTabByParamAsync(tabArgs.InitialPageType, tabArgs.NavigationParameter);
@@ -282,7 +228,6 @@ namespace Files.App.ViewModels
 					}
 					catch { }
 				}
-
 				if (parameter is string navArgs)
 					await NavigationHelpers.AddNewTabByPathAsync(typeof(ShellPanesPage), navArgs, true);
 				else if (parameter is PaneNavigationArguments paneArgs)
@@ -290,17 +235,12 @@ namespace Files.App.ViewModels
 				else if (parameter is TabBarItemParameter tabArgs)
 					await NavigationHelpers.AddNewTabByParamAsync(tabArgs.InitialPageType, tabArgs.NavigationParameter);
 			}
-
-			// Load the app theme resources
 			ResourcesService.LoadAppResources(AppearanceSettingsService);
-
 			await Task.WhenAll(
 				DrivesViewModel.UpdateDrivesAsync(),
 				NetworkService.UpdateComputersAsync(),
 				NetworkService.UpdateShortcutsAsync());
 		}
-
-		// Command methods
 
 		private async void ExecuteNavigateToNumberedTabKeyboardAcceleratorCommand(KeyboardAcceleratorInvokedEventArgs? e)
 		{
@@ -317,21 +257,13 @@ namespace Files.App.ViewModels
 				VirtualKey.Number9 => AppInstances.Count - 1,
 				_ => AppInstances.Count - 1,
 			};
-
-			// Only select the tab if it is in the list
 			if (indexToSelect < AppInstances.Count)
 			{
 				App.AppModel.TabStripSelectedIndex = indexToSelect;
-
-				// Small delay for the UI to load
 				await Task.Delay(500);
-
-				// Refocus on the file list
 				(SelectedTabItem?.TabItemContent as Control)?.Focus(FocusState.Programmatic);
 			}
-
 			e.Handled = true;
 		}
-
 	}
 }
