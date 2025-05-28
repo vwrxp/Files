@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Files Community
 // Licensed under the MIT License.
 
+using System.Runtime.InteropServices;
 using System.Text;
 using Windows.Storage;
 
@@ -61,20 +62,49 @@ namespace Files.App.Actions
 			if (paths.Length is 0)
 				return null;
 
+#if WINDOWS
 			var path = paths[0] + (paths[0].EndsWith('\\') ? "\\" : "");
-
 			var args = new StringBuilder($"-d \"{path}\"");
 			for (int i = 1; i < paths.Length; i++)
 			{
 				path = paths[i] + (paths[i].EndsWith('\\') ? "\\" : "");
 				args.Append($" ; nt -d \"{path}\"");
 			}
-
 			return new()
 			{
 				FileName = "wt.exe",
 				Arguments = args.ToString()
 			};
+#else
+			// Linux/macOS: откроем bash или gnome-terminal/xterm
+			string folder = paths[0];
+			// Попробуем gnome-terminal, затем xterm, затем bash
+			if (File.Exists("/usr/bin/gnome-terminal"))
+			{
+				return new()
+				{
+					FileName = "/usr/bin/gnome-terminal",
+					Arguments = $"--working-directory=\"{folder}\""
+				};
+			}
+			else if (File.Exists("/usr/bin/xterm"))
+			{
+				return new()
+				{
+					FileName = "/usr/bin/xterm",
+					Arguments = $"-e 'cd \"{folder}\"; bash'"
+				};
+			}
+			else
+			{
+				// Просто bash в нужной папке
+				return new()
+				{
+					FileName = "bash",
+					WorkingDirectory = folder
+				};
+			}
+#endif
 		}
 
 		protected virtual string[] GetPaths()

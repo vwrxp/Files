@@ -8,7 +8,8 @@
 	<Style BasedOn="{StaticResource DefaultToolbarStyle}" TargetType="local:Toolbar" />
 
 	<Style x:Key="DefaultToolbarStyle" TargetType="local:Toolbar">
-		<Setter Property="Background" Value="{ThemeResource ToolbarBackgroundBrush}" />
+		<Setter Property="Background" Value="{ThemeResource ToolbarAcrylicBackgroundBrush}" />
+		<!-- Fallback: Value="{ThemeResource ToolbarBackgroundBrush}" -->
 		<Setter Property="BackgroundSizing" Value="InnerBorderEdge" />
 		<Setter Property="BorderBrush" Value="{ThemeResource ToolbarBorderBrush}" />
 		<Setter Property="BorderThickness" Value="{ThemeResource ToolbarBorderThickness}" />

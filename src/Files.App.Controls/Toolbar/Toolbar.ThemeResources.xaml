@@ -49,4 +49,8 @@
 	<x:Double x:Key="ToolbarButtonLargeMinHeight">40</x:Double>
 	<!--#endregion-->
 
+	<!-- Acrylic эффект для Toolbar -->
+	<SolidColorBrush x:Key="ToolbarAcrylicFallbackBrush" Color="#F3F3F3" />
+	<AcrylicBrush x:Key="ToolbarAcrylicBackgroundBrush" BackgroundSource="HostBackdrop" TintColor="#CCFFFFFF" TintOpacity="0.6" FallbackSource="Brush" FallbackColor="#F3F3F3" />
+
 </ResourceDictionary>

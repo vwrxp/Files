@@ -445,6 +445,14 @@
 		</Setter>
 	</Style>
 
+	<!-- Анимация для выделения и наведения -->
+	<Storyboard x:Key="NavigationViewItemPointerOverAnimation">
+		<ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" To="#FFE0E0E0" Duration="0:0:0.2" />
+	</Storyboard>
+	<Storyboard x:Key="NavigationViewItemSelectedAnimation">
+		<ColorAnimation Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)" To="#FFCCE4FF" Duration="0:0:0.2" />
+	</Storyboard>
+
 	<Style TargetType="NavigationViewItem">
 		<Setter Property="Foreground" Value="{ThemeResource NavigationViewItemForeground}" />
 		<Setter Property="Background" Value="{ThemeResource NavigationViewItemBackground}" />

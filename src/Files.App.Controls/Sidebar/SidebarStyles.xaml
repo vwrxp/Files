@@ -473,4 +473,27 @@
 			</Setter.Value>
 		</Setter>
 	</Style>
+
+	<!-- Добавим эффект Acrylic для sidebar -->
+	<Style x:Key="SidebarAcrylicBackground" TargetType="Border">
+		<Setter Property="Background">
+			<Setter.Value>
+				<AcrylicBrush BackgroundSource="HostBackdrop" TintColor="#CCFFFFFF" TintOpacity="0.6" FallbackColor="#F3F3F3" />
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<!-- Применим стиль к корневому элементу sidebar (пример для Border) -->
+	<!--
+	<Border Style="{StaticResource SidebarAcrylicBackground}">
+		...
+	</Border>
+	-->
+
+	<!-- Добавим плавную анимацию появления sidebar -->
+	<Storyboard x:Key="SidebarShowAnimation">
+		<DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.3" />
+		<DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" From="-40" To="0" Duration="0:0:0.3" />
+	</Storyboard>
+
 </ResourceDictionary>
