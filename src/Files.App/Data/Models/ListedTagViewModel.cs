@@ -51,6 +51,7 @@ namespace Files.App.Data.Models
 		{
 			Tag = tag;
 			NewColor = tag.Color;
+			NewName = tag.Name;
 		}
 	}
 }

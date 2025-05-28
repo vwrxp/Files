@@ -111,9 +111,9 @@ namespace Files.App.Views.Settings
 			if (editingTag is null)
 				return;
 
-			editingTag!.CanCommit = editingTag!.IsNameValid && (
-				editingTag!.NewName != editingTag!.Tag.Name ||
-				CommunityToolkit.WinUI.Helpers.ColorHelper.ToHex(sender.Color) != editingTag!.Tag.Color
+			editingTag.CanCommit = editingTag.IsNameValid && (
+				editingTag.NewName != editingTag.Tag.Name ||
+				editingTag.NewColor != editingTag.Tag.Color
 			);
 		}
 

@@ -37,7 +37,7 @@ namespace Files.App.ViewModels.Settings
 
 			Tags = [];
 			Tags.CollectionChanged += Tags_CollectionChanged;
-			fileTagsSettingsService.FileTagList?.ForEach(tag => Tags.Add(new ListedTagViewModel(tag)));
+			fileTagsSettingsService.FileTagList?.ForEach(tag => Tags.Add(new ListedTagViewModel(tag) { NewName = tag.Name }));
 
 			isBulkOperation = false;
 		}
@@ -73,7 +73,7 @@ namespace Files.App.ViewModels.Settings
 
 			isBulkOperation = true;
 			Tags.Clear();
-			fileTagsSettingsService.FileTagList?.ForEach(tag => Tags.Add(new ListedTagViewModel(tag)));
+			fileTagsSettingsService.FileTagList?.ForEach(tag => Tags.Add(new ListedTagViewModel(tag) { NewName = tag.Name }));
 			isBulkOperation = false;
 		}
 
@@ -87,8 +87,15 @@ namespace Files.App.ViewModels.Settings
 			fileTagsSettingsService.EditTag(item.Tag.Uid, newName, color);
 
 			isBulkOperation = true;
-			Tags.Clear();
-			fileTagsSettingsService.FileTagList?.ForEach(tag => Tags.Add(new ListedTagViewModel(tag)));
+			var index = Tags.IndexOf(item);
+			if (index >= 0)
+			{
+				var updatedTag = fileTagsSettingsService.FileTagList.FirstOrDefault(t => t.Uid == item.Tag.Uid);
+				if (updatedTag != null)
+				{
+					Tags[index] = new ListedTagViewModel(updatedTag) { NewName = updatedTag.Name };
+				}
+			}
 			isBulkOperation = false;
 		}
 
