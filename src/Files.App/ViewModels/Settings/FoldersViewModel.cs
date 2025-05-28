@@ -248,17 +248,16 @@ namespace Files.App.ViewModels.Settings
 			}
 		}
 
+		// Use expression-bodied property for brevity
 		public bool ShowCheckboxesWhenSelectingItems
 		{
 			get => UserSettingsService.FoldersSettingsService.ShowCheckboxesWhenSelectingItems;
 			set
 			{
-				if (value != UserSettingsService.FoldersSettingsService.ShowCheckboxesWhenSelectingItems)
-				{
-					UserSettingsService.FoldersSettingsService.ShowCheckboxesWhenSelectingItems = value;
-
-					OnPropertyChanged();
-				}
+				if (value == UserSettingsService.FoldersSettingsService.ShowCheckboxesWhenSelectingItems)
+					return;
+				UserSettingsService.FoldersSettingsService.ShowCheckboxesWhenSelectingItems = value;
+				OnPropertyChanged();
 			}
 		}
 
@@ -268,10 +267,11 @@ namespace Files.App.ViewModels.Settings
 			get => sizeUnitFormat;
 			set
 			{
-				if (SetProperty(ref sizeUnitFormat, value))
-				{
-					UserSettingsService.FoldersSettingsService.SizeUnitFormat = SizeUnitsOptions.First(e => e.Value == value).Key;
-				}
+				if (!SetProperty(ref sizeUnitFormat, value))
+					return;
+				// Use TryGetValue for clarity and safety
+				if (SizeUnitsOptions.FirstOrDefault(e => e.Value == value).Key is SizeUnitTypes key)
+					UserSettingsService.FoldersSettingsService.SizeUnitFormat = key;
 			}
 		}
 	}

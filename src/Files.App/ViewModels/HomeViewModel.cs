@@ -10,11 +10,11 @@ namespace Files.App.ViewModels
 	{
 		// Dependency injections
 
-		private IUserSettingsService UserSettingsService { get; } = Ioc.Default.GetRequiredService<IUserSettingsService>();
+		private readonly IUserSettingsService UserSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
 
 		// Properties
 
-		public ObservableCollection<WidgetContainerItem> WidgetItems { get; } = [];
+		public ObservableCollection<WidgetContainerItem> WidgetItems { get; } = new();
 
 		// Commands
 
@@ -22,10 +22,7 @@ namespace Files.App.ViewModels
 
 		// Constructor
 
-		public HomeViewModel()
-		{
-			ReloadWidgetsCommand = new AsyncRelayCommand(ExecuteReloadWidgetsCommand);
-		}
+		public HomeViewModel() => ReloadWidgetsCommand = new AsyncRelayCommand(ExecuteReloadWidgetsCommand);
 
 		// Methods
 
@@ -123,60 +120,30 @@ namespace Files.App.ViewModels
 
 		private bool InsertWidget(WidgetContainerItem widgetModel, int atIndex)
 		{
-			// The widget must not be null and must implement IWidgetItemModel
 			if (widgetModel.WidgetItemModel is not IWidgetViewModel widgetItemModel)
-			{
 				return false;
-			}
-
-			// Don't add existing ones!
 			if (!CanAddWidget(widgetItemModel.WidgetName))
-			{
 				return false;
-			}
-
 			if (atIndex > WidgetItems.Count)
-			{
 				WidgetItems.Add(widgetModel);
-			}
 			else
-			{
 				WidgetItems.Insert(atIndex, widgetModel);
-			}
-
 			return true;
 		}
 
-		public bool CanAddWidget(string widgetName)
-		{
-			return !(WidgetItems.Any((item) => item.WidgetItemModel.WidgetName == widgetName));
-		}
+		public bool CanAddWidget(string widgetName) => !WidgetItems.Any(item => item.WidgetItemModel.WidgetName == widgetName);
 
 		private void RemoveWidgetAt(int index)
 		{
-			if (index < 0)
-			{
+			if (index < 0 || index >= WidgetItems.Count)
 				return;
-			}
-
 			WidgetItems[index].Dispose();
 			WidgetItems.RemoveAt(index);
 		}
 
 		public void RemoveWidget<TWidget>() where TWidget : IWidgetViewModel
 		{
-			int indexToRemove = -1;
-
-			for (int i = 0; i < WidgetItems.Count; i++)
-			{
-				if (typeof(TWidget).IsAssignableFrom(WidgetItems[i].WidgetControl.GetType()))
-				{
-					// Found matching types
-					indexToRemove = i;
-					break;
-				}
-			}
-
+			var indexToRemove = WidgetItems.FindIndex(item => typeof(TWidget).IsAssignableFrom(item.WidgetControl.GetType()));
 			RemoveWidgetAt(indexToRemove);
 		}
 
@@ -192,9 +159,8 @@ namespace Files.App.ViewModels
 
 		public void Dispose()
 		{
-			for (int i = 0; i < WidgetItems.Count; i++)
-				WidgetItems[i].Dispose();
-
+			foreach (var item in WidgetItems)
+				item.Dispose();
 			WidgetItems.Clear();
 		}
 	}

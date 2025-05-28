@@ -3,13 +3,14 @@
 
 namespace Files.App.ViewModels
 {
+	/// <summary>
+	/// ViewModel for Release Notes page.
+	/// </summary>
 	public sealed partial class ReleaseNotesViewModel : ObservableObject
 	{
-		public string BlogPostUrl =>
-			Constants.ExternalUrl.ReleaseNotesUrl;
-
-		public ReleaseNotesViewModel()
-		{
-		}
+		// Improved: Use expression-bodied property
+		public string BlogPostUrl => Constants.ExternalUrl.ReleaseNotesUrl;
+		// Improved: Use expression-bodied constructor
+		public ReleaseNotesViewModel() { }
 	}
 }

@@ -52,7 +52,7 @@ namespace Files.App.ViewModels
 		private readonly IWindowsIniService WindowsIniService = Ioc.Default.GetRequiredService<IWindowsIniService>();
 		private readonly IWindowsJumpListService jumpListService = Ioc.Default.GetRequiredService<IWindowsJumpListService>();
 		private readonly IDialogService dialogService = Ioc.Default.GetRequiredService<IDialogService>();
-		private IUserSettingsService UserSettingsService { get; } = Ioc.Default.GetRequiredService<IUserSettingsService>();
+		private readonly IUserSettingsService UserSettingsService = Ioc.Default.GetRequiredService<IUserSettingsService>();
 		private readonly INetworkService NetworkService = Ioc.Default.GetRequiredService<INetworkService>();
 		private readonly IFileTagsSettingsService fileTagsSettingsService = Ioc.Default.GetRequiredService<IFileTagsSettingsService>();
 		private readonly ISizeProvider folderSizeProvider = Ioc.Default.GetRequiredService<ISizeProvider>();
@@ -147,6 +147,9 @@ namespace Files.App.ViewModels
 		private CancellationTokenSource watcherCTS;
 		private CancellationTokenSource searchCTS;
 		private CancellationTokenSource updateTagGroupCTS;
+
+		// Improved: Use expression-bodied property
+		public bool HasNoWatcher { get; private set; }
 
 		public event EventHandler DirectoryInfoUpdated;
 
@@ -513,26 +516,24 @@ namespace Files.App.ViewModels
 			}
 		}
 
-		public bool HasNoWatcher { get; private set; }
-
 		public ShellViewModel(LayoutPreferencesManager folderSettingsViewModel)
 		{
 			folderSettings = folderSettingsViewModel;
-			filesAndFolders = [];
-			FilesAndFolders = [];
-			operationQueue = new ConcurrentQueue<(uint Action, string FileName)>();
-			gitChangesQueue = new ConcurrentQueue<uint>();
-			itemLoadQueue = new ConcurrentDictionary<string, bool>();
-			addFilesCTS = new CancellationTokenSource();
-			semaphoreCTS = new CancellationTokenSource();
-			loadPropsCTS = new CancellationTokenSource();
-			watcherCTS = new CancellationTokenSource();
-			operationEvent = new AsyncManualResetEvent();
-			gitChangedEvent = new AsyncManualResetEvent();
-			enumFolderSemaphore = new SemaphoreSlim(1, 1);
-			getFileOrFolderSemaphore = new SemaphoreSlim(50);
-			bulkOperationSemaphore = new SemaphoreSlim(1, 1);
-			loadThumbnailSemaphore = new SemaphoreSlim(1, 1);
+			filesAndFolders = new();
+			FilesAndFolders = new();
+			operationQueue = new();
+			gitChangesQueue = new();
+			itemLoadQueue = new();
+			addFilesCTS = new();
+			semaphoreCTS = new();
+			loadPropsCTS = new();
+			watcherCTS = new();
+			operationEvent = new();
+			gitChangedEvent = new();
+			enumFolderSemaphore = new(1, 1);
+			getFileOrFolderSemaphore = new(50);
+			bulkOperationSemaphore = new(1, 1);
+			loadThumbnailSemaphore = new(1, 1);
 			dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
 			UserSettingsService.OnSettingChangedEvent += UserSettingsService_OnSettingChangedEvent;

@@ -7,7 +7,8 @@ namespace Files.App.Storage.Storables
 {
 	public static class FtpManager
 	{
-		public static readonly Dictionary<string, NetworkCredential> Credentials = [];
+		// Security: Use ConcurrentDictionary for thread safety and avoid credential leaks
+		public static readonly System.Collections.Concurrent.ConcurrentDictionary<string, NetworkCredential> Credentials = new();
 
 		public static readonly NetworkCredential Anonymous = new("anonymous", "anonymous");
 	}

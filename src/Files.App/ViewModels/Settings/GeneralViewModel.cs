@@ -381,8 +381,10 @@ namespace Files.App.ViewModels.Settings
 			get => UserSettingsService.GeneralSettingsService.ShowQuickAccessWidget;
 			set
 			{
-				if (value != UserSettingsService.GeneralSettingsService.ShowQuickAccessWidget)
-					UserSettingsService.GeneralSettingsService.ShowQuickAccessWidget = value;
+				if (value == UserSettingsService.GeneralSettingsService.ShowQuickAccessWidget)
+					return;
+				UserSettingsService.GeneralSettingsService.ShowQuickAccessWidget = value;
+				OnPropertyChanged();
 			}
 		}
 
@@ -391,8 +393,10 @@ namespace Files.App.ViewModels.Settings
 			get => UserSettingsService.GeneralSettingsService.ShowDrivesWidget;
 			set
 			{
-				if (value != UserSettingsService.GeneralSettingsService.ShowDrivesWidget)
-					UserSettingsService.GeneralSettingsService.ShowDrivesWidget = value;
+				if (value == UserSettingsService.GeneralSettingsService.ShowDrivesWidget)
+					return;
+				UserSettingsService.GeneralSettingsService.ShowDrivesWidget = value;
+				OnPropertyChanged();
 			}
 		}
 
@@ -401,21 +405,10 @@ namespace Files.App.ViewModels.Settings
 			get => UserSettingsService.GeneralSettingsService.ShowNetworkLocationsWidget;
 			set
 			{
-				if (value != UserSettingsService.GeneralSettingsService.ShowNetworkLocationsWidget)
-					UserSettingsService.GeneralSettingsService.ShowNetworkLocationsWidget = value;
-			}
-		}
-
-		public bool ShowFileTagsWidget
-		{
-			get => UserSettingsService.GeneralSettingsService.ShowFileTagsWidget;
-			set
-			{
-				if (value != UserSettingsService.GeneralSettingsService.ShowFileTagsWidget)
-				{
-					UserSettingsService.GeneralSettingsService.ShowFileTagsWidget = value;
-					OnPropertyChanged();
-				}
+				if (value == UserSettingsService.GeneralSettingsService.ShowNetworkLocationsWidget)
+					return;
+				UserSettingsService.GeneralSettingsService.ShowNetworkLocationsWidget = value;
+				OnPropertyChanged();
 			}
 		}
 
@@ -424,8 +417,10 @@ namespace Files.App.ViewModels.Settings
 			get => UserSettingsService.GeneralSettingsService.ShowRecentFilesWidget;
 			set
 			{
-				if (value != UserSettingsService.GeneralSettingsService.ShowRecentFilesWidget)
-					UserSettingsService.GeneralSettingsService.ShowRecentFilesWidget = value;
+				if (value == UserSettingsService.GeneralSettingsService.ShowRecentFilesWidget)
+					return;
+				UserSettingsService.GeneralSettingsService.ShowRecentFilesWidget = value;
+				OnPropertyChanged();
 			}
 		}
 
@@ -475,25 +470,10 @@ namespace Files.App.ViewModels.Settings
 			{
 				if (value == UserSettingsService.GeneralSettingsService.ShowCompressionOptions)
 					return;
-
 				UserSettingsService.GeneralSettingsService.ShowCompressionOptions = value;
 				OnPropertyChanged();
 			}
 		}
-
-		// TODO uncomment code when feature is marked as stable
-		//public bool ShowFlattenOptions
-		//{
-		//	get => UserSettingsService.GeneralSettingsService.ShowFlattenOptions;
-		//	set
-		//	{
-		//		if (value == UserSettingsService.GeneralSettingsService.ShowFlattenOptions)
-		//			return;
-
-		//		UserSettingsService.GeneralSettingsService.ShowFlattenOptions = value;
-		//		OnPropertyChanged();
-		//	}
-		//}
 
 		public bool ShowSendToMenu
 		{
